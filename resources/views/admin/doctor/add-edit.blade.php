@@ -21,14 +21,18 @@
                     </div>
                     <div class="col-md-4 adfilter-single">
                         <label for="categoryId">Speciality </label>
-                        <select name="categoryId[]" id="categoryId" multiple="multiple">
-                            {{-- @dd(getCategory($isDoctor)) --}}
+                        {{-- <select name="categoryId[]" id="categoryId" multiple="multiple">
                             @if (isset($isDoctor))
                             {{ getCategory($isDoctor?->doctorProfile?->doctorsCategories->pluck('id')) }}
                             @else
                             {{ getAllCategory() }}
-                            @endif
-                        </select>
+                            @endif --}}
+                            <select name="categoryId[]" id="categoryId" multiple="multiple">
+                                {{-- {!! getCategoryOptions(isset($isDoctor) ? $isDoctor->doctorProfile->doctorsCategories->pluck('id') : []) !!} --}}
+                                {!! isset($isDoctor) && isset($isDoctor->doctorProfile) && isset($isDoctor->doctorProfile->doctorsCategories) 
+                                    ? getCategoryOptions($isDoctor->doctorProfile->doctorsCategories->pluck('id')) 
+                                    : getCategoryOptions([]) !!}
+                            </select>
                         @error('categoryId')
                             <span class="invalid-feedback d-block" role="alert">
                                 <strong>{{ $message }}</strong>

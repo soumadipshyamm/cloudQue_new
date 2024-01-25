@@ -13,4 +13,5 @@ interface DoctorContract
     // public function findEmailOrPhone(array $data);
     // public function otpSend(array $data);
     public function findId($data);
+    public function findProfileId($id);
 }

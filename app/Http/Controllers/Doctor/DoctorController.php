@@ -69,11 +69,17 @@ class DoctorController extends BaseController
                     }
                     $message = 'Doctor Created Successfully';
                 }else{
+                    //update category
                     $id = uuidtoid($request->uuid, 'users');
                     $insert_arry = $request->merge(['type' => 'doctor', 'parent_id' => null])->except(['_token', '_method', 'id']);
                     $addUser = $this->AuthContract->updateUser($insert_arry);
                     $insertArry = $request->merge(['userId' => $id])->except(['_token', '_method', 'id']);
                     $isDoctorCreated = $this->DoctorContract->updateProfile($insertArry);
+                    $isDoctor = $this->DoctorContract->findProfileId($id);
+                    if(isset($request->categoryId)){
+                        // dd($request->categoryId);
+                        $isDoctor->doctorsCategories()->sync($request->categoryId);
+                    }
                     $message = 'Doctor Updated Successfully';
                 }
                 if ($isDoctorCreated) {

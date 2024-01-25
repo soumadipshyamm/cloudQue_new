@@ -1,5 +1,4 @@
 <?php
-
 use App\Models\Category;
 use App\Models\DoctorsAvailabilities;
 use App\Models\ProfileClinic;
@@ -10,6 +9,7 @@ use App\Models\User;
 use App\Models\weekDays;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Image;
-
 if (!function_exists('isSluggable')) {
     function isSluggable($value)
     {
@@ -354,21 +353,16 @@ if (!function_exists('arraytoobj')) {
         foreach ($datas as $key => $data) {
             if ($data['open_time'] != null) {
                 $dddt = $data['open_time'];
-
                 return $dddt;
                 // dd($data['open_time']);
             }
         }
         // dd($dddt);
-
         // return 0;
-
     }
 }
-
 // *****************************Generate Date & Week Days*******************************************
 if (!function_exists('getDateAndWeekDay')) {
-
     function getDateAndWeekDay($start_date = null, $end_date = null)
     {
         $date_rang = [];
@@ -399,23 +393,24 @@ if (!function_exists('getClinic')) {
         }
     }
 }
-// *********************************************************************************
-if (!function_exists('getCategory')) {
-    function getCategory($id)
-    {
-        $id = $id->toArray() ?? [];
-        $data = Category::all();
-        foreach ($data as $key => $val) {
-            echo "<option value='" . $val->id . "'".(in_array($val->id, $id) ? 'selected':'').">" . $val->name . "</option>";
-            // if ($id == $val->id) {
-            //     echo "<option value='" . $val->id . "' selected>" . $val->name . "</option>";
-            // } else {
-            //     echo "<option value='" . $val->id . "' >" . $val->name . "</option>";
-            // }
+// ********************************Multiple select Category Options *************************************************
+function getCategoryOptions($selectedCategories)
+{
+    $categories = Category::all();
+    $options = '';
+    foreach ($categories as $category) {
+        $categories = Category::all();
+        $options = '';
+        $selectedCategoriesArray = ($selectedCategories instanceof Collection) ? $selectedCategories->toArray() : $selectedCategories;
+        foreach ($categories as $category) {
+            $categoryId = $category->id;
+            $selected = in_array($categoryId, $selectedCategoriesArray) ? 'selected' : '';
+            $options .= "<option value='$categoryId' $selected>{$category->name}</option>";
         }
+        return $options;
     }
 }
-
+// *******************************All Category**************************************************
 if (!function_exists('getAllCategory')) {
     function getAllCategory()
     {
@@ -477,10 +472,8 @@ if (!function_exists('getTimeIncruse')) {
         $start_time = Carbon::parse($startTime);
         $end_time = Carbon::parse($endTime);
         $interval = CarbonInterval::minutes(10);
-
         $current_time = $start_time->copy();
         $timeSlots = [];
-
         while ($current_time <= $end_time) {
             $timeSlots[] = $current_time->format('H:i');
             $current_time->add($interval);
@@ -500,11 +493,9 @@ if (!function_exists('checkAvalableSchedul')) {
             }
         }
         return false;
-
     }
 }
 // *********************************************************************************
-
 // if (!function_exists('findClinic')) {
 //     function findClinic()
 //     {
@@ -528,11 +519,62 @@ if (!function_exists('datetoday')) {
     {
         $carbonDate = Carbon::createFromFormat('Y-m-d', $data);
         $dayOfWeek = $carbonDate->format('l');
-
         return $dayOfWeek;
     }
 }
 // *********************************************************************************
+if (!function_exists('slotbreaktime')) {
+    function slotbreaktime($data)
+    {
+        // dd($data->toArray());
+        foreach ($data as $ky => $btime){
+            return $btime;
+        }
+        // $carbonDate = Carbon::createFromFormat('Y-m-d', $data);
+        // $dayOfWeek = $carbonDate->format('l');
+        // return $data;
+    }
+}
+
+// array:3 [ // app\Helpers\Utilities.php:529
+//     0 => array:10 [
+//       "id" => 1
+//       "uuid" => null
+//       "schedule_id" => 27
+//       "doctors_availabilitie_id" => 2
+//       "break_day" => "Sunday"
+//       "break_from" => "14:30:00"
+//       "break_to" => "15:00:00"
+//       "is_active" => 1
+//       "created_at" => null
+//       "updated_at" => null
+//     ]
+//     1 => array:10 [
+//       "id" => 2
+//       "uuid" => null
+//       "schedule_id" => 27
+//       "doctors_availabilitie_id" => 2
+//       "break_day" => "Sunday"
+//       "break_from" => "16:30:00"
+//       "break_to" => "16:50:00"
+//       "is_active" => 1
+//       "created_at" => null
+//       "updated_at" => null
+//     ]
+//     2 => array:10 [
+//       "id" => 3
+//       "uuid" => null
+//       "schedule_id" => 27
+//       "doctors_availabilitie_id" => 2
+//       "break_day" => "Sunday"
+//       "break_from" => "19:30:00"
+//       "break_to" => "20:00:00"
+//       "is_active" => 1
+//       "created_at" => null
+//       "updated_at" => null
+//     ]
+//   ]
+
 // *********************************************************************************
 // *********************************************************************************
 if (!function_exists('uuidtoid')) {

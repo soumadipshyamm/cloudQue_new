@@ -2,7 +2,6 @@
 @section('schedule', 'active')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/vendor/datatables/responsive.bootstrap4.min.css') }}">
-
 @endpush
 @section('content')
     <div class="dashboard_mainsec">
@@ -78,30 +77,37 @@
 
             <div class="company_profiles card-body">
                 <div class="stats_box row">
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="d-flex align-items-center">
                             <div class=" p-2 rounded-circle" style="width:30px;height:30px;background-color:#7df0ae">
                             </div>
                             <p class="m-0 ml-2">Available</p>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="d-flex align-items-center">
                             <div class=" p-2 rounded-circle" style="width:30px;height:30px;background-color:#8aaeed">
                             </div>
                             <p class="m-0 ml-2">Premium/Emergency</p>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="d-flex align-items-center">
                             <div class=" p-2 rounded-circle" style="width:30px;height:30px;background-color:#f5d1a2">
                             </div>
                             <p class="m-0 ml-2">RAC</p>
                         </div>
                     </div>
+                    <div class="col-3">
+                        <div class="d-flex align-items-center">
+                            <div class=" p-2 rounded-circle" style="width:30px;height:30px;background-color:#f1300e">
+                            </div>
+                            <p class="m-0 ml-2">Break Time</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+    </div>
     </div>
     <div class="time_row" style="display:none;">
         <div class="stats_box row" id="bookingTimes">

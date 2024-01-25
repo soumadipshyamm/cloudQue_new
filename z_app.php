@@ -179,3 +179,73 @@ Copy code
 
     });
 </script>
+
+
+
+
+schedule/partials   
+@foreach (\Carbon\CarbonPeriod::create($formattedStartTime, $interval, $formattedEndTime) as $k => $times)
+                    {{-- @foreach ($breakTime as $ky => $btime) --}}
+                    {{-- {{ timeConvert($btime->break_from) }} --}}
+                    {{-- @if (timeConvert($btime->break_from) <= $times->format('h:i A') && $times->format('h:i A') > timeConvert($btime->break_to)) --}}
+                    @if ($times->format('h:i A') < slotbreaktime('01:48 PM') || slotbreaktime('02:20 PM') < $times->format('h:i A'))
+                        <div class="col">
+                            @if ($time->total_patient - $rac <= $k)
+                                {{-- RAC Slot --}}
+                                <div class="slot_statsb_single" style="background-color:#f5d1a2">
+                                    <input type="hidden" id="time{{ $key . '-' . $k }}" name="slotId"
+                                        value="{{ $time->id }}">
+                                    <input id="time{{ $key . '-' . $k }}" type="radio" name="booking_time"
+                                        value="{{ $date . ' ' . $times->format('G:i:s') }}" class="booking_time"
+                                        disabled>
+                                    {{-- {{ $k }} --}}
+                                    <label for="time{{ $key . '-' . $k }}" class="slot_text-dsgn">
+                                        {{ $times->format('h:i A') }}
+                                    </label>
+                                </div>
+                            @else
+                                {{-- //Emergency  slot  --}}
+                                @if ($k <= $emergency)
+                                    <div class="slot_statsb_single " style="background-color:#8aaeed">
+                                        <input type="hidden" id="time{{ $key . '-' . $k }}" name="slotId"
+                                            value="{{ $time->id }}">
+                                        <input id="time{{ $key . '-' . $k }}" type="radio" name="booking_time"
+                                            value="{{ $date . ' ' . $times->format('G:i:s') }}" class="booking_time">
+                                        {{-- {{ $k }} --}}
+                                        <label for="time{{ $key . '-' . $k }}" class="slot_text-dsgn">
+                                            {{ $times->format('h:i A') }}
+                                        </label>
+                                    </div>
+                                @else
+                                    {{-- Available Slot --}}
+                                    <div class="slot_statsb_single" style="background-color:#7df0ae">
+                                        <input type="hidden" id="time{{ $key . '-' . $k }}" name="slotId"
+                                            value="{{ $time->id }}">
+                                        <input id="time{{ $key . '-' . $k }}" type="radio" name="booking_time"
+                                            value="{{ $date . ' ' . $times->format('G:i:s') }}" class="booking_time"
+                                            disabled>
+                                        {{-- {{ $k }} --}}
+                                        <label for="time{{ $key . '-' . $k }}" class="slot_text-dsgn">
+                                            {{ $times->format('h:i A') }}
+                                        </label>
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+                    @else
+                    <div class="col">
+                        <div class="slot_statsb_single" style="background-color:#df4508">
+                            <input type="hidden" id="time{{ $key . '-' . $k }}" name="slotId"
+                                value="{{ $time->id }}">
+                            <input id="time{{ $key . '-' . $k }}" type="radio" name="booking_time"
+                                value="{{ $date . ' ' . $times->format('G:i:s') }}" class="booking_time" disabled>
+                            {{-- {{ $k }} --}}
+                            <label for="time{{ $key . '-' . $k }}" class="slot_text-dsgn">
+                                {{ $times->format('h:i A') }}
+                            </label>
+                        </div>
+                    </div>
+                    @endif
+                    {{-- @endif
+                    @endforeach --}}
+                @endforeach

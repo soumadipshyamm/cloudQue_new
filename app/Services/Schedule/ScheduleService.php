@@ -3,6 +3,7 @@
 namespace App\Services\Schedule;
 
 use App\Contracts\Schedule\ScheduleContract;
+use App\Models\DoctorBreakTime;
 use App\Models\DoctorsAvailabilities;
 use App\Models\Profile;
 use App\Models\role;
@@ -33,10 +34,9 @@ class ScheduleService implements ScheduleContract
     }
     function featchSchedule(array $data)
     {
-        $data = Schedule::with('slots','scheduleBreakTime','slots.doctorBreakTime')->where(['doctor_id' => $data['doctorId'], 'clinics_id' => $data['clinicId']])->where('is_active', 1)->first();
+        $data = Schedule::with('slots', 'scheduleBreakTime')->where(['doctor_id' => $data['doctorId'], 'clinics_id' => $data['clinicId']])->where('is_active', 1)->first();
         return $data;
     }
-
     function updateSchedule(array $data)
     {
         $clinicData = auth()->user()->clinicUser->first()->id ?? null;
@@ -48,20 +48,18 @@ class ScheduleService implements ScheduleContract
         ]);
         return $isCreate;
     }
-
     function createSchedule(array $data)
     {
         $scheduleData = $data;
         $schedules = Schedule::where('clinics_id', $scheduleData['clinicId'])
             ->where('doctor_id', $scheduleData['doctorId'])
             ->first();
-
         // If schedules exist, delete them and their associated time slots
         if ($schedules) {
+            $schedules->scheduleBreakTime()->delete();
             $schedules->slots()->delete();
             $schedules->delete();
         }
-
         // Create a new schedule
         $createdSchedule = Schedule::create([
             'clinics_id' => $scheduleData['clinicId'] ?? null,
@@ -69,21 +67,15 @@ class ScheduleService implements ScheduleContract
             'valid_date' => $scheduleData['valid_date'] ?? null,
             'schedule' => $scheduleData['schedule'] ?? null,
         ]);
-
         return $createdSchedule;
     }
-
     function createAvailableDay(array $datas, $id)
     {
         $scheduleData = $datas;
-
         $data = [];
-
         foreach ($scheduleData['available_from'] as $day => $timeSlots) {
             foreach ($timeSlots as $index => $timeSlot) {
                 $data[] = [
-                    // 'clinics_id' => $scheduleData['clinicId'],
-                    // 'doctor_id' => $scheduleData['doctorId'],
                     'schedule_id' => $id->id,
                     'available_day' => $day,
                     'available_from' => $timeSlot,
@@ -92,14 +84,37 @@ class ScheduleService implements ScheduleContract
                 ];
             }
         }
-
         $isCreate = DoctorsAvailabilities::insert($data);
-        return $isCreate;
+        if ($isCreate) {
+            $avaldoctorTime = DoctorsAvailabilities::where('schedule_id', $id->id)->get();
+            return $avaldoctorTime;
+        }
     }
-
-    function createBreakTime(array $datas, $id)
+    function createBreakTime(array $datas, $ids)
     {
-        dd($id);
+        $scheduleData = $datas;
+
+        $docavltimeid = [];
+        foreach ($ids as $key => $id) {
+            if (($id->available_from != null) && ($id->available_to != null)) {
+                $docavltimeid[]=$id->id;
+            }
+        }
+        $data = [];
+        foreach ($scheduleData['break_from'] as $day => $timeSlots) {
+            foreach ($timeSlots as $index => $timeSlot) {
+                if (!empty($timeSlot) && $timeSlot != null) {
+                    $data[] = [
+                        'schedule_id' => $id,
+                        'break_day' => $day,
+                        'break_from' => $timeSlot,
+                        'break_to' => $scheduleData['break_to'][$day][$index],
+                    ];
+                }
+            }
+        }
+        $isCreate = DoctorBreakTime::insert($data);
+        return $isCreate;
     }
     // function createSchedule(array $data)
     // {
@@ -112,7 +127,6 @@ class ScheduleService implements ScheduleContract
     //     ]);
     //     return $isCreate;
     // }
-
     function schdule($data)
     {
         $timeArr = [];
@@ -142,8 +156,6 @@ class ScheduleService implements ScheduleContract
         return Schedule::where('user_id', $id)->first();
     }
 }
-
-
 // 'available_from'=>, 'available_to'=>, 'total_patient'=>,
 // 'available_from'=>, 'available_to'=>, 'total_patient'=>,
 // 'available_from'=>, 'available_to'=>, 'total_patient'=>,

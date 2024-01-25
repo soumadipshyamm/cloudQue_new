@@ -53,4 +53,10 @@ class DoctorService implements DoctorContract
         $data = User::with('doctorProfile')->where('id', $id)->first();
         return $data;
     }
+
+    function findProfileId($id)
+    {
+        $data = ProfileDoctor::where('user_id', $id)->first();
+        return $data;
+    }
 }

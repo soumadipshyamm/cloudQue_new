@@ -36,9 +36,9 @@ class Schedule extends Model
         return $this->belongsTo(User::class, 'doctor_id', 'id');
     }
 
-    public function scheduleBreakTime()
+    public function scheduleBreakTime(): HasMany
     {
-        return $this->hasMany(DoctorBreakTime::class, 'schedule_id');
+        return $this->hasMany(DoctorBreakTime::class, 'schedule_id', 'id');
     }
 
     public function slots(): HasMany

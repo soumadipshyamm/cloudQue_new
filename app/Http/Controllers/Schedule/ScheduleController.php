@@ -45,14 +45,6 @@ class ScheduleController extends BaseController
         return view('admin.schedule-management.index', compact('fetchData', 'fetchDoctorId'));
     }
 
-    // $fetchDoctorId = $this->DoctorContract->findId(auth()->user()->id);
-    // $fetchClinicList = $this->ScheduleContract->findDoctorToClinicId($fetchDoctorId->id);
-
-    // foreach ($fetchClinicList as $value) {
-    //     $fetchClinicListData[] = $value->clinices;
-    // }
-    // $fetchDoctorId = $fetchDoctorId;
-
     public function doctorScheduleList($uuid)
     {
         $this->setPageTitle('Clinic Doctor List');
@@ -83,7 +75,7 @@ class ScheduleController extends BaseController
                 $insertArry = $request->except(['_token', '_method', 'id']);
                 $isSchedule = $this->ScheduleContract->createSchedule($insertArry);
                 $availableDay = $this->ScheduleContract->createAvailableDay($insertArry, $isSchedule);
-                // $breakTime = $this->ScheduleContract->createBreakTime($insertArry,$availableDay);
+                $breakTime = $this->ScheduleContract->createBreakTime($insertArry, $availableDay);
                 $message = 'Schedule Created Successfully';
                 if ($isSchedule) {
                     DB::commit();
@@ -105,19 +97,20 @@ class ScheduleController extends BaseController
         $dayOfWeek = $carbonDate->format('l');
         $insertArry = $request->except(['_token', '_method']);
         $fetchData = $this->ScheduleContract->featchSchedule($insertArry);
-        // dd($fetchData);
-        return view('admin.schedule-management.partials.booking_times', compact('fetchData', 'dayOfWeek', 'date'));
+         $fetchData->slots;
+         $fetchData->scheduleBreakTime;
+
+        // dd($fetchData->toArray());
+        return view('admin.schedule-management.partials.booking_times', compact('fetchData','dayOfWeek', 'date'));
     }
 
     // ****************************************************************************************
     public function doctorScheduleSlot($did, $cid)
     {
         $fetchSchedule = Schedule::where('id', $did)->first();
+        // $fetchSchedule->doctorBreakTime;
         $fetchSchedule->slots;
         // dd($fetchSchedule->toArray());
         return view('admin.schedule-management.schedule-list', compact('fetchSchedule', 'cid'));
     }
 }
-// "date" => "2024-02-02"
-//   "doctorId" => "3"
-//   "clinicId" => "1"

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webpatser\Uuid\Uuid;
 
@@ -23,8 +24,8 @@ class DoctorBreakTime extends Model
     {
         return $this->hasMany(DoctorsAvailabilities::class, 'doctors_availabilitie_id');
     }
-    public function scheduleTime(): HasMany
+    public function scheduleTime(): BelongsTo
     {
-        return $this->hasMany(Schedule::class, 'schedule_id');
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 }
